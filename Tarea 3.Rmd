@@ -5,57 +5,116 @@ date: "2025-06-06"
 ---
 
 # Ejercicio 1:
-## Cálculo de método básico 
 
+
+## Funciones adicionales para construción del método
+```{r}
+combinacion_suma <- function(vec1, vec2, indice_df) { #donde x es indice
+  suma <- 0
+  
+  if (indice_df == 0) {
+    suma <- vec1[1] * vec2[1]
+    return(suma)
+  } 
+  else {
+    for (i in 0:indice_df) {
+      suma <- suma + vec1[1 + i] * vec2[(indice_df + 1) - i]
+    }
+    return(suma)
+  }
+}
+
+```
 
 ```{r}
-produc_vectores <- function(vec_conv1, vec_conv2){
+convoluciador <- function(vec_conv1, vec_conv2){
   
   # Creación de vector para guardar los resultados de los productos
-  vec_produc <- vector(mode = "numeric", length = n)
+  vec_nueva_conv <- vector(mode = "numeric", length = length(vec_conv1))
   
   for (i in 1:length(vec_conv1)) {
-  vec_produc(i) <- 
+    indice= i-1
+    vec_nueva_conv[i] <- combinacion_suma(vec_conv1, vec_conv2, indice)
   }
   
-  
-  
+  return(vec_nueva_conv)
 }
+
 ```
 
 
 
+## Función para el cálculo \( f_S(x) \) por el método básico
+
+La columna (9), etiquetada como \( f_S(x) \), representa la función de masa de probabilidad (pmf) de la suma compuesta
+
+\[
+S = X_1 + X_2 + \cdots + X_N,
+\]
+
+donde:
+
+- \( N \sim \text{Poisson}(\lambda) \),
+- Las \( X_i \) son variables aleatorias independientes e idénticamente distribuidas (i.i.d.).
+
+La distribución de \( f_S(x) \) se calcula como una mezcla:
+
+\[
+f_S(x) = \sum_{n=0}^{\infty} P(N = n) \cdot p^{*n}(x),
+\]
+
+donde \( p^{*n}(x) \) representa la convolución \(n\)-ésima de la distribución de los \(X_i\), es decir, la probabilidad de que la suma de \(n\) valores de \(X\) sea igual a \(x\). Para este ejercicio, en la función se declara un máximo de reclamos posibles.
 
 ```{r}
-metodo_basico <- function(lambda, prob_montos, montos_enteros) {
-  n <- montos_enteros # definir n según la entrada
+metodo_basico <- function(lambda, prob_montos, max_num_reclamos) {
+  n <- max_num_reclamos
   
-  # Crear los nombres de columnas
-  columnas <- c("x", "p0(x)", "p(x)", paste0("p", 2:n, "(x)"), "fs(x)")
+  # Crear nombres de columnas
+  columnas <- c("x", "p*0(x)", "p(x)", paste0("p*", 2:n, "(x)"), "fs(x)")
   
-  # Crear el data.frame vacío
-  df_convolucion <- as.data.frame(matrix(NA, nrow = n+1 , ncol = length(columnas)))
-  
-  # Llenar el dataframe
-  indice <- c(0:n)
-  prob_montos <- c(0, prob_montos)
+  # Crear el data.frame con n+1 filas
+  df_convolucion <- as.data.frame(matrix(0, nrow = n + 1, ncol = length(columnas)))
   colnames(df_convolucion) <- columnas
   
+  # Llenar el dataframe
+  df_convolucion[["x"]] <- 0:n
+  prob_montos <- c(0, prob_montos)
+  df_convolucion[["p*0(x)"]] <- c(1, rep(0, n))  # p*0(x)
+  df_convolucion[["p(x)"]][1:length(prob_montos)] <- prob_montos  # p(x)
   
-  df_convolucion[["x"]] <- indice
-  df_convolucion[["p0(x)"]] <- c(1, rep(0,n))
-  df_convolucion[["p(x)"]] <- prob_montos #arreglar
+  # Calcular p*2(x)
+  df_convolucion[["p*2(x)"]] <- convoluciador(df_convolucion[[3]], df_convolucion[[3]])
   
+  # Calcular p*3(x), ..., p*n(x)
+  for (i in 5:(n + 2)) {
+    a <- i - 1
+    
+    df_convolucion[[i]] <- convoluciador(df_convolucion[[3]], df_convolucion[[a]])
+  }
+
+  # Vector de probabilidades de Poisson(lambda)
+  vec_prob_N <- sapply(0:n, function(i) dpois(i, lambda))
   
+  # Calcular fs(x)
+  for (i in 1:(n + 1)) {
+    v <- as.numeric(df_convolucion[i, ])
+    v_sin_extremos <- v[-c(1, length(v))]  # Quitamos x y fs(x)
+    
+    df_convolucion[["fs(x)"]][i] <- sum(v_sin_extremos * vec_prob_N)
+  }
   
   return(df_convolucion)
 }
 
-# Llamar correctamente a la función
-pepe <- metodo_basico(lambda = 0.8, prob_montos = c(1, 2, 3), montos_enteros = 6)
 
-View(pepe)
+
+# Llamar correctamente a la función
+pepe <- metodo_basico(lambda = 0.8, prob_montos = c(0.25,0.375, 0.375), max_num_reclamos = 6)
+
+print(pepe)
 
       
 ```
+
+
 
