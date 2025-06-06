@@ -1,0 +1,61 @@
+---
+title: "Tarea 4 Seguros de no vida"
+output: html_document
+date: "2025-06-06"
+---
+
+# Ejercicio 1:
+## Cálculo de método básico 
+
+
+```{r}
+produc_vectores <- function(vec_conv1, vec_conv2){
+  
+  # Creación de vector para guardar los resultados de los productos
+  vec_produc <- vector(mode = "numeric", length = n)
+  
+  for (i in 1:length(vec_conv1)) {
+  vec_produc(i) <- 
+  }
+  
+  
+  
+}
+```
+
+
+
+
+```{r}
+metodo_basico <- function(lambda, prob_montos, montos_enteros) {
+  n <- montos_enteros # definir n según la entrada
+  
+  # Crear los nombres de columnas
+  columnas <- c("x", "p0(x)", "p(x)", paste0("p", 2:n, "(x)"), "fs(x)")
+  
+  # Crear el data.frame vacío
+  df_convolucion <- as.data.frame(matrix(NA, nrow = n+1 , ncol = length(columnas)))
+  
+  # Llenar el dataframe
+  indice <- c(0:n)
+  prob_montos <- c(0, prob_montos)
+  colnames(df_convolucion) <- columnas
+  
+  
+  df_convolucion[["x"]] <- indice
+  df_convolucion[["p0(x)"]] <- c(1, rep(0,n))
+  df_convolucion[["p(x)"]] <- prob_montos #arreglar
+  
+  
+  
+  return(df_convolucion)
+}
+
+# Llamar correctamente a la función
+pepe <- metodo_basico(lambda = 0.8, prob_montos = c(1, 2, 3), montos_enteros = 6)
+
+View(pepe)
+
+      
+```
+
