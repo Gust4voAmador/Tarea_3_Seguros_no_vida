@@ -476,6 +476,156 @@ print(pepe)</code></pre>
 ## 7 0.03092286</code></pre>
 </div>
 </div>
+<div id="ejercicio-2" class="section level1">
+<h1>Ejercicio 2</h1>
+<div id="caso-n-poissonλ" class="section level2">
+<h2>Caso N ~ Poisson(λ)</h2>
+<p><span class="math inline">\(a = 0\)</span> y <span class="math inline">\(b = \lambda\)</span>, con fórmula recursiva:</p>
+<p><span class="math display">\[\begin{align*}
+f_S(0) &amp;= e^{-\lambda(1-f_0)}, \\
+
+f_S(x) &amp;= \frac{\lambda}{x} \sum_{y=1}^x yf_X(y)f_S(x-y),
+\end{align*}\]</span></p>
+<p>para <span class="math inline">\(x = 1,2 ...\)</span></p>
+<pre class="r"><code>recursiva_poi &lt;- function(lambda, x, f_X){
+  
+  f_S0 &lt;- exp(-lambda * (1-f_X[1]))
+  
+  if(x==0){
+    
+    f_Sx &lt;- f_S0
+    
+  } else{
+    
+    suma = 0
+    
+    # Se define el máximo valor “y” que existe en f_X:
+    max_y &lt;- length(f_X) - 1 
+    
+    for(y in 1:min(x, max_y)){
+      
+      suma &lt;- suma+ y * f_X[y+1] * recursiva_poi(lambda, (x-y), f_X)
+      
+    }
+    
+    f_Sx &lt;- (lambda/x) * suma
+    
+  }
+  
+  return(f_Sx)
+  
+}</code></pre>
+</div>
+<div id="caso-n-binomialrq" class="section level2">
+<h2>Caso N ~ Binomial(r;q)</h2>
+<p><span class="math inline">\(a = \frac{-q}{1-q}\)</span> y <span class="math inline">\(b = \frac{(n+1)q}{1-q}\)</span>, además <span class="math inline">\(P_N(t) = [1+q(t-1)]^n\)</span>. Su fórmula
+rescursiva es:</p>
+<p><span class="math display">\[\begin{align*}
+f_S(0) &amp;= [1+q(f_0-1)]^n. \\
+f_S(x) &amp;= \frac{q}{1+q(f_o-1)} \sum_{y=1}^x \left[ (n+1) \frac{y}{x}
+- 1 \right] f_X(y) f_S(x-y),
+\end{align*}\]</span></p>
+<p>para <span class="math inline">\(x = 1,2, ....\)</span></p>
+<pre class="r"><code>recursiva_bin &lt;- function(n, q, x, f_X){
+  
+  f_S0 &lt;- (1 + q * (f_X[1] - 1))^n
+  
+  if(x == 0){
+    
+    f_Sx &lt;- f_S0
+    
+  } else{
+    
+    suma &lt;- 0
+    
+    # Se define el máximo valor “y” que existe en f_X:
+    max_y &lt;- length(f_X) - 1 
+    
+    for(y in 1:min(x, max_y)){
+      
+      suma &lt;- suma + ((n+1) * y/x - 1) * f_X[y+1] * recursiva_bin(n, q, (x-y), f_X)
+      
+    }
+    
+    f_Sx &lt;- q/(1 + q * (f_X[1]-1)) * suma
+    
+  }
+  
+  return(f_Sx)
+  
+}</code></pre>
+</div>
+<div id="caso-n-nbrβ" class="section level2">
+<h2>Caso N ~ NB(r;β)</h2>
+<p><span class="math inline">\(a = \frac{\beta}{1+\beta}\)</span> y
+<span class="math inline">\(b = \frac{(r-1)\beta}{1+\beta}\)</span>,
+además <span class="math inline">\(P_N(t) =
+[1-\beta(t-1)]^{-1}\)</span>. Su fórmula recursiva es:</p>
+<p><span class="math display">\[\begin{align*}
+f_S(0) &amp;= [1-\beta(f_0-1)]^{-r}, \\
+f_S(x) &amp;= \frac{\beta}{1-\beta(f_0-1)} \sum_{y=1}^x \left[1 -
+\frac{(r-1)y}{x} \right] f_X(y) f_S(x-y),
+\end{align*}\]</span></p>
+<p>para <span class="math inline">\(x = 1, 2, ...\)</span></p>
+<pre class="r"><code>recursiva_nb &lt;- function(r, beta, x, f_X){
+  
+  f_S0 &lt;- (1 - beta * (f_X[1] - 1))^(-r)
+  
+  if(x == 0){
+    
+    f_Sx &lt;- f_S0
+    
+  } else{
+    
+    suma &lt;- 0
+    
+    # Se define el máximo valor “y” que existe en f_X:
+    max_y &lt;- length(f_X) - 1 
+    
+    for(y in 1:min(x, max_y)){
+      
+      suma &lt;- suma + (1 + (r-1) * y/x) * f_X[y+1] * recursiva_nb(r, beta, (x-y), f_X)
+      
+    }
+    
+    f_Sx &lt;- beta/(1 - beta * (f_X[1] - 1)) * suma
+    
+  }
+  
+  return(f_Sx)
+  
+}</code></pre>
+</div>
+<div id="ejercicio-11-de-la-lista-del-capítulo-5" class="section level2">
+<h2>Ejercicio 11 de la lista del Capítulo 5</h2>
+<pre class="r"><code># Parámetros
+f_X &lt;- c(0, 0.7, 0.3)
+x &lt;- 5
+lambda &lt;- 4.5
+r &lt;- 4.5
+p &lt;- 0.5
+m &lt;- 9
+beta &lt;- 0.5</code></pre>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>a &lt;- sapply(0:5, function(x) recursiva_poi(lambda, x, f_X))
+cat(&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;, a)</code></pre>
+<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.011109 0.03499334 0.07011165 0.1051112 0.1301005 0.1387234</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>b &lt;- sapply(0:5, function(x) recursiva_bin(r, p, x, f_X))
+cat(&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;, b)</code></pre>
+<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.04419417 0.1392116 0.2301964 0.2456506 0.1853364 0.1014077</code></pre>
+<ol start="3" style="list-style-type: lower-alpha">
+<li></li>
+</ol>
+<pre class="r"><code>c &lt;- sapply(0:5, function(x) recursiva_nb(m, beta, x, f_X))
+cat(&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;, c)</code></pre>
+<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.02601229 0.05462582 0.08714119 0.1091505 0.1199759 0.1186286</code></pre>
+</div>
+</div>
 
 
 

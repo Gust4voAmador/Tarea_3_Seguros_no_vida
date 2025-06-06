@@ -116,5 +116,171 @@ print(pepe)
       
 ```
 
+# Ejercicio 2
+
+## Caso N ~ Poisson(λ)
+
+$a = 0$ y $b = \lambda$, con fórmula recursiva:
+
+\begin{align*}
+f_S(0) &= e^{-\lambda(1-f_0)}, \\
+
+f_S(x) &= \frac{\lambda}{x} \sum_{y=1}^x yf_X(y)f_S(x-y), 
+\end{align*}
+
+para $x = 1,2 ...$
+
+```{r}
+recursiva_poi <- function(lambda, x, f_X){
+  
+  f_S0 <- exp(-lambda * (1-f_X[1]))
+  
+  if(x==0){
+    
+    f_Sx <- f_S0
+    
+  } else{
+    
+    suma = 0
+    
+    # Se define el máximo valor “y” que existe en f_X:
+    max_y <- length(f_X) - 1 
+    
+    for(y in 1:min(x, max_y)){
+      
+      suma <- suma+ y * f_X[y+1] * recursiva_poi(lambda, (x-y), f_X)
+      
+    }
+    
+    f_Sx <- (lambda/x) * suma
+    
+  }
+  
+  return(f_Sx)
+  
+}
+```
+
+
+## Caso N ~ Binomial(r;q)
+
+$a = \frac{-q}{1-q}$ y $b = \frac{(n+1)q}{1-q}$, además $P_N(t) = [1+q(t-1)]^n$. Su fórmula rescursiva es:
+
+\begin{align*}
+f_S(0) &= [1+q(f_0-1)]^n. \\
+f_S(x) &= \frac{q}{1+q(f_o-1)} \sum_{y=1}^x \left[ (n+1) \frac{y}{x} - 1 \right] f_X(y) f_S(x-y),
+\end{align*}
+
+para $x = 1,2, ....$
+
+
+```{r}
+recursiva_bin <- function(n, q, x, f_X){
+  
+  f_S0 <- (1 + q * (f_X[1] - 1))^n
+  
+  if(x == 0){
+    
+    f_Sx <- f_S0
+    
+  } else{
+    
+    suma <- 0
+    
+    # Se define el máximo valor “y” que existe en f_X:
+    max_y <- length(f_X) - 1 
+    
+    for(y in 1:min(x, max_y)){
+      
+      suma <- suma + ((n+1) * y/x - 1) * f_X[y+1] * recursiva_bin(n, q, (x-y), f_X)
+      
+    }
+    
+    f_Sx <- q/(1 + q * (f_X[1]-1)) * suma
+    
+  }
+  
+  return(f_Sx)
+  
+}
+```
+
+
+## Caso N ~ NB(r;β)
+
+$a = \frac{\beta}{1+\beta}$ y $b = \frac{(r-1)\beta}{1+\beta}$, además $P_N(t) = [1-\beta(t-1)]^{-1}$. Su fórmula recursiva es:
+
+\begin{align*}
+f_S(0) &= [1-\beta(f_0-1)]^{-r}, \\
+f_S(x) &= \frac{\beta}{1-\beta(f_0-1)} \sum_{y=1}^x \left[1 - \frac{(r-1)y}{x} \right] f_X(y) f_S(x-y),
+\end{align*}
+
+para $x = 1, 2, ...$
+
+```{r}
+recursiva_nb <- function(r, beta, x, f_X){
+  
+  f_S0 <- (1 - beta * (f_X[1] - 1))^(-r)
+  
+  if(x == 0){
+    
+    f_Sx <- f_S0
+    
+  } else{
+    
+    suma <- 0
+    
+    # Se define el máximo valor “y” que existe en f_X:
+    max_y <- length(f_X) - 1 
+    
+    for(y in 1:min(x, max_y)){
+      
+      suma <- suma + (1 + (r-1) * y/x) * f_X[y+1] * recursiva_nb(r, beta, (x-y), f_X)
+      
+    }
+    
+    f_Sx <- beta/(1 - beta * (f_X[1] - 1)) * suma
+    
+  }
+  
+  return(f_Sx)
+  
+}
+```
+
+## Ejercicio 11 de la lista del Capítulo 5
+
+```{r}
+# Parámetros
+f_X <- c(0, 0.7, 0.3)
+x <- 5
+lambda <- 4.5
+r <- 4.5
+p <- 0.5
+m <- 9
+beta <- 0.5
+```
+
+
+a)
+
+```{r}
+a <- sapply(0:5, function(x) recursiva_poi(lambda, x, f_X))
+cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', a)
+```
+
+b)
+
+```{r}
+b <- sapply(0:5, function(x) recursiva_bin(r, p, x, f_X))
+cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', b)
+```
+
+c)
+
+```{r}
+c <- sapply(0:5, function(x) recursiva_nb(m, beta, x, f_X))
+cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', c)
+```
 
 
