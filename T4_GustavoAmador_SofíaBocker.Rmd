@@ -113,8 +113,83 @@ pepe <- metodo_basico(lambda = 0.8, prob_montos = c(0.25,0.375, 0.375), max_num_
 
 print(pepe)
 
-      
 ```
+
+## Tabla método alternativo
+```{r}
+# --- Paso 1: Distribuciones transformadas ---
+
+poisson_transformada <- function(lambda, salto, max_valor) {
+  vec <- rep(0, max_valor + 1)
+  for (n in 0:(max_valor %/% salto)) {
+    x <- n * salto
+    if (x <= max_valor) {
+      vec[x + 1] <- dpois(n, lambda)
+    }
+  }
+  return(vec)
+}
+
+
+# --- Paso 2: Método alternativo con tabla detallada ---
+
+metodo_alternativo_con_tabla <- function(lambda_total, probs, max_valor) {
+  lambdas <- lambda_total * probs
+  saltos <- c(1, 2, 3)
+  
+  # Calcular distribuciones individuales transformadas
+  dist1 <- poisson_transformada(lambdas[1], saltos[1], max_valor)
+  dist2 <- poisson_transformada(lambdas[2], saltos[2], max_valor)
+  dist3 <- poisson_transformada(lambdas[3], saltos[3], max_valor)
+  
+  # Calcular convolución N1 + 2N2
+  conv_12 <- convoluciador(dist1, dist2)
+  
+  # Calcular convolución final: N1 + 2N2 + 3N3
+  conv_123 <- convoluciador(conv_12, dist3)
+  
+  # Construir tabla estilo libro
+  df <- data.frame(
+    x = 0:max_valor,
+    `Pr(1N1 = x)` = dist1,
+    `Pr(2N2 = x)` = dist2,
+    `Pr(3N3 = x)` = dist3,
+    `Pr(N1 + 2N2 = x)` = conv_12,
+    `f_s(x)` = conv_123
+  )
+  
+  return(df)
+}
+
+# --- Ejecutar la función ---
+resultado_detallado <- metodo_alternativo_con_tabla(
+  lambda_total = 0.8,
+  probs = c(0.25, 0.375, 0.375),
+  max_valor = 6
+)
+
+print(resultado_detallado)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Ejercicio 2
 
