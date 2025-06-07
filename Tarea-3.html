@@ -615,15 +615,15 @@ cat(&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;, a)</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
 <li></li>
 </ol>
-<pre class="r"><code>b &lt;- sapply(0:5, function(x) recursiva_bin(r, p, x, f_X))
+<pre class="r"><code>b &lt;- sapply(0:5, function(x) recursiva_nb(r, beta, x, f_X))
 cat(&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;, b)</code></pre>
-<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.04419417 0.1392116 0.2301964 0.2456506 0.1853364 0.1014077</code></pre>
+<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.1612833 0.1693474 0.1812421 0.1480771 0.1146253 0.08100654</code></pre>
 <ol start="3" style="list-style-type: lower-alpha">
 <li></li>
 </ol>
-<pre class="r"><code>c &lt;- sapply(0:5, function(x) recursiva_nb(m, beta, x, f_X))
+<pre class="r"><code>c &lt;- sapply(0:5, function(x) recursiva_bin(m, p, x, f_X))
 cat(&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;, c)</code></pre>
-<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.02601229 0.05462582 0.08714119 0.1091505 0.1199759 0.1186286</code></pre>
+<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.001953125 0.01230469 0.03972656 0.08580469 0.1377668 0.173661</code></pre>
 </div>
 </div>
 
