@@ -272,15 +272,14 @@ cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', a)
 b)
 
 ```{r}
-b <- sapply(0:5, function(x) recursiva_bin(r, p, x, f_X))
+b <- sapply(0:5, function(x) recursiva_nb(r, beta, x, f_X))
 cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', b)
 ```
 
 c)
 
 ```{r}
-c <- sapply(0:5, function(x) recursiva_nb(m, beta, x, f_X))
+c <- sapply(0:5, function(x) recursiva_bin(m, p, x, f_X))
 cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', c)
 ```
-
 
