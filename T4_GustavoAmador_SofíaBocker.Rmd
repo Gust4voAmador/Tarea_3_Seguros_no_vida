@@ -109,7 +109,7 @@ metodo_basico <- function(lambda, prob_montos, max_num_reclamos) {
 
 
 # Llamar correctamente a la función
-pepe <- metodo_basico(lambda = 0.8, prob_montos = c(0.25,0.375, 0.375), max_num_reclamos = 6)
+pepe <- metodo_basico(lambda = 2, prob_montos = c((0.1*1),(0.1*2), (0.1*3),(0.1*4)), max_num_reclamos = 4)
 
 print(pepe)
 
@@ -163,9 +163,9 @@ metodo_alternativo_con_tabla <- function(lambda_total, probs, max_valor) {
 
 # --- Ejecutar la función ---
 resultado_detallado <- metodo_alternativo_con_tabla(
-  lambda_total = 0.8,
-  probs = c(0.25, 0.375, 0.375),
-  max_valor = 6
+  lambda_total = 2,
+  probs = c((0.1*1),(0.1*2), (0.1*3),(0.1*4)),
+  max_valor = 4
 )
 
 print(resultado_detallado)
