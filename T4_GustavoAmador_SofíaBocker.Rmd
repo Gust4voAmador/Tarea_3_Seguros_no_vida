@@ -394,28 +394,37 @@ recursiva_nb <- function(r, beta, x, f_X){
 
 ## Ejercicio 11 de la lista del Capítulo 5
 
+a)
+
 ```{r}
 # Parámetros
 f_X <- c(0, 0.7, 0.3)
 x <- 5
 lambda <- 4.5
-r <- 4.5
-p <- 0.5
-m <- 9
-beta <- 0.5
-```
 
-
-a)
-
-```{r}
+# Aplicar función
 a <- sapply(0:5, function(x) recursiva_poi(lambda, x, f_X))
 cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', a)
 ```
 
 b)
 
+El incio da $p = 0.5$ para la Binomial Negativa, sin embargo, sabemos que:
+
+\begin{align*}
+  p &= \frac{1}{1+\beta}\\
+  \implies 0.5 &= \frac{1}{1+\beta}\\
+  \implies \beta &= 1
+\end{align*}
+
+por lo que el parámetro a usar es $\beta = 1$
+
 ```{r}
+# Parámetros
+r <- 4.5
+beta <- 1
+
+# Aplicar función
 b <- sapply(0:5, function(x) recursiva_nb(r, beta, x, f_X))
 cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', b)
 ```
@@ -423,6 +432,11 @@ cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', b)
 c)
 
 ```{r}
+# Parámetros
+m <- 9
+p <- 0.5
+
+# Aplicar función
 c <- sapply(0:5, function(x) recursiva_bin(m, p, x, f_X))
 cat('$f_S(x)$ para x = 0, 1, 2, ..., 5:', c)
 ```

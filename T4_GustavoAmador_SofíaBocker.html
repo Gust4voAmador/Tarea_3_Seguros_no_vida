@@ -516,31 +516,48 @@ f_S(x) &amp;= \frac{\beta}{1-\beta(f_0-1)} \sum_{y=1}^x \left[1 -
 </div>
 <div id="ejercicio-11-de-la-lista-del-capítulo-5" class="section level2">
 <h2>Ejercicio 11 de la lista del Capítulo 5</h2>
+<ol style="list-style-type: lower-alpha">
+<li></li>
+</ol>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Parámetros</span></span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>f_X <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.7</span>, <span class="fl">0.3</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">5</span></span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>lambda <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">9</span></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fl">0.5</span></span></code></pre></div>
-<ol style="list-style-type: lower-alpha">
-<li></li>
-</ol>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="cf">function</span>(x) <span class="fu">recursiva_poi</span>(lambda, x, f_X))</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;</span>, a)</span></code></pre></div>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co"># Aplicar función</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="cf">function</span>(x) <span class="fu">recursiva_poi</span>(lambda, x, f_X))</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;</span>, a)</span></code></pre></div>
 <pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.011109 0.03499334 0.07011165 0.1051112 0.1301005 0.1387234</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
 <li></li>
 </ol>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="cf">function</span>(x) <span class="fu">recursiva_nb</span>(r, beta, x, f_X))</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;</span>, b)</span></code></pre></div>
-<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.1612833 0.1693474 0.1812421 0.1480771 0.1146253 0.08100654</code></pre>
+<p>El incio da <span class="math inline">\(p = 0.5\)</span> para la
+Binomial Negativa, sin embargo, sabemos que:</p>
+<p><span class="math display">\[\begin{align*}
+  p &amp;= \frac{1}{1+\beta}\\
+  \implies 0.5 &amp;= \frac{1}{1+\beta}\\
+  \implies \beta &amp;= 1
+\end{align*}\]</span></p>
+<p>por lo que el parámetro a usar es <span class="math inline">\(\beta =
+1\)</span></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Parámetros</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fl">4.5</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co"># Aplicar función</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="cf">function</span>(x) <span class="fu">recursiva_nb</span>(r, beta, x, f_X))</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;</span>, b)</span></code></pre></div>
+<pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.04419417 0.06960582 0.09682667 0.1082298 0.1109668 0.104988</code></pre>
 <ol start="3" style="list-style-type: lower-alpha">
 <li></li>
 </ol>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="cf">function</span>(x) <span class="fu">recursiva_bin</span>(m, p, x, f_X))</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;</span>, c)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Parámetros</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">9</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># Aplicar función</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="cf">function</span>(x) <span class="fu">recursiva_bin</span>(m, p, x, f_X))</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;$f_S(x)$ para x = 0, 1, 2, ..., 5:&#39;</span>, c)</span></code></pre></div>
 <pre><code>## $f_S(x)$ para x = 0, 1, 2, ..., 5: 0.001953125 0.01230469 0.03972656 0.08580469 0.1377668 0.173661</code></pre>
 </div>
 </div>
