@@ -1,13 +1,24 @@
 ---
-title: "Tarea 4 Seguros de no vida"
-output: html_document
+title: "Tarea 4 de Seguros de No-vida"
+author: "Gustavo Amador Fonseca C20451 y Sofía Bocker C11102"
 date: "2025-06-06"
+output:
+  prettydoc::html_pretty:
+    theme: cayman  # Puedes cambiar a 'tactile' o 'architect' si prefieres
+    #toc: true  # Mostrar tabla de contenidos
+    toc_depth: 2  # Profundidad de la tabla de contenidos
+    highlight: github  # Estilo de resaltado de sintaxis
+    fig_width: 8
+    fig_height: 5
+extra_dependencies:
+  - amsmath
+  - someotherpackagee
 ---
 
 # Ejercicio 1:
 
 
-## Funciones adicionales para construción del método
+#### Funciones adicionales para construción del método
 ```{r}
 combinacion_suma <- function(vec1, vec2, indice_df) { #donde x es indice
   suma <- 0
@@ -46,7 +57,7 @@ convoluciador <- function(vec_conv1, vec_conv2){
 
 ## Función para el cálculo \( f_S(x) \) por el método básico
 
-La columna (9), etiquetada como \( f_S(x) \), representa la función de masa de probabilidad (pmf) de la suma compuesta
+La columna etiquetada como \( f_S(x) \), representa la función de masa de probabilidad (pmf) de la suma compuesta
 
 \[
 S = X_1 + X_2 + \cdots + X_N,
@@ -106,19 +117,39 @@ metodo_basico <- function(lambda, prob_montos, max_num_reclamos) {
   return(df_convolucion)
 }
 
-
-
-# Llamar correctamente a la función
-pepe <- metodo_basico(lambda = 2, prob_montos = c((0.1*1),(0.1*2), (0.1*3),(0.1*4)), max_num_reclamos = 4)
-
-print(pepe)
-
 ```
 
-## Tabla método alternativo
-```{r}
-# --- Paso 1: Distribuciones transformadas ---
+## Método Alternativo
 
+Sea \( S = X_1 + \cdots + X_N \), donde:
+
+- \( N \sim \text{Poisson}(\lambda) \),
+- \( X_i \) i.i.d. con valores en \( \{1, 2, \dots, k\} \) y \( \mathbb{P}(X = j) = p_j \).
+
+El método alternativo usa la propiedad:
+
+> Si \( N \sim \text{Poisson}(\lambda) \) y cada evento se clasifica con probabilidad \( p_j \), entonces el número de eventos \( N_j \sim \text{Poisson}(\lambda p_j) \), independientes entre sí.
+
+Así, la suma compuesta se expresa como:
+
+\[
+S = \sum_{j=1}^{k} j N_j,
+\]
+
+donde cada \( N_j \sim \text{Poisson}(\lambda p_j) \).
+
+Luego, \( f_S(x) \) se obtiene mediante convolución discreta de las distribuciones transformadas:
+
+\[
+f_S(x) = \left( P(N_1 = x) \star P(2N_2 = x) \star \cdots \star P(k N_k = x) \right)(x),
+\]
+
+donde \( j N_j \) solo toma valores múltiplos de \( j \), y \( \star \) es la convolución discreta.
+
+
+
+```{r}
+# Función para calcular Poisson transformada
 poisson_transformada <- function(lambda, salto, max_valor) {
   vec <- rep(0, max_valor + 1)
   for (n in 0:(max_valor %/% salto)) {
@@ -130,49 +161,87 @@ poisson_transformada <- function(lambda, salto, max_valor) {
   return(vec)
 }
 
-
-# --- Paso 2: Método alternativo con tabla detallada ---
-
-metodo_alternativo_con_tabla <- function(lambda_total, probs, max_valor) {
-  lambdas <- lambda_total * probs
-  saltos <- c(1, 2, 3)
-  
-  # Calcular distribuciones individuales transformadas
-  dist1 <- poisson_transformada(lambdas[1], saltos[1], max_valor)
-  dist2 <- poisson_transformada(lambdas[2], saltos[2], max_valor)
-  dist3 <- poisson_transformada(lambdas[3], saltos[3], max_valor)
-  
-  # Calcular convolución N1 + 2N2
-  conv_12 <- convoluciador(dist1, dist2)
-  
-  # Calcular convolución final: N1 + 2N2 + 3N3
-  conv_123 <- convoluciador(conv_12, dist3)
-  
-  # Construir tabla estilo libro
-  df <- data.frame(
-    x = 0:max_valor,
-    `Pr(1N1 = x)` = dist1,
-    `Pr(2N2 = x)` = dist2,
-    `Pr(3N3 = x)` = dist3,
-    `Pr(N1 + 2N2 = x)` = conv_12,
-    `f_s(x)` = conv_123
-  )
-  
-  return(df)
+# Función para convolucionar dos vectores
+convoluciador2 <- function(vec1, vec2) {
+  len <- length(vec1)
+  resultado <- rep(0, len)
+  for (i in 0:(len - 1)) {
+    for (j in 0:i) {
+      resultado[i + 1] <- resultado[i + 1] + vec1[j + 1] * vec2[i - j + 1]
+    }
+  }
+  return(resultado)
 }
 
-# --- Ejecutar la función ---
-resultado_detallado <- metodo_alternativo_con_tabla(
-  lambda_total = 2,
-  probs = c((0.1*1),(0.1*2), (0.1*3),(0.1*4)),
-  max_valor = 4
-)
+# Función general que construye toda la tabla
+metodo_alternativo <- function(lambda_total, prob_montos, max_valor) {
+  n_montos <- length(prob_montos)
+  montos <- 1:n_montos
+  lambdas <- lambda_total * prob_montos
+  
+  # Distribuciones transformadas individuales
+  distribuciones <- lapply(seq_along(montos), function(i) {
+    poisson_transformada(lambdas[i], montos[i], max_valor)
+  })
+  
+  # Inicializar convolución acumulada
+  resultado_conv <- distribuciones[[1]]
+  
+  if (n_montos > 1) {
+    for (i in 2:n_montos) {
+      resultado_conv <- convoluciador2(resultado_conv, distribuciones[[i]])
+    }
+  }
+  
+  # Construir la tabla final
+  tabla <- data.frame(x = 0:max_valor)
+  
+  for (i in seq_along(distribuciones)) {
+    nombre_col <- paste0("Pr(", montos[i], "N", i, " = x)")
+    tabla[[nombre_col]] <- distribuciones[[i]]
+  }
+  
+  if (n_montos >= 2) {
+    tabla[["Pr(N1 + ... + Nk-1 = x)"]] <- resultado_conv
+  }
+  
+  tabla[["f_S(x)"]] <- resultado_conv
+  
+  return(tabla)
+}
 
-print(resultado_detallado)
 
 ```
 
+## Resolución de ejercicio 4 de la lista
 
+### Solución Método Básico
+```{r}
+solv_clasica <- metodo_basico(lambda = 2, prob_montos = c((0.1*1),(0.1*2), (0.1*3),(0.1*4)), max_num_reclamos = 4)
+print(solv_clasica)
+```
+
+
+### Solución Método Alternativo 
+```{r}
+resultado <- metodo_alternativo (
+  lambda_total = 2,
+  prob_montos = c(0.1, 0.2, 0.3, 0.4), # Montos 1, 2, 3, 4
+  max_valor = 4
+)
+print(resultado)
+```
+Por lo tanto la solución el ejercicio 4 de la lista de miceláneos del capítulo es:
+\[
+f_S(x) =
+\begin{cases}
+0.1353, & \text{si } x = 0, \\
+0.0271, & \text{si } x = 1, \\
+0.0568, & \text{si } x = 2, \\
+0.0922, & \text{si } x = 3, \\
+0.1364, & \text{si } x = 4, \\
+\end{cases}
+\]
 
 
 
